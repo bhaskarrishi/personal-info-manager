@@ -254,7 +254,8 @@ class SignupWindow(QWidget):
             is_valid = False
         
         # Check all fields are filled and terms accepted
-        all_filled = username and email and password and confirm_password and terms_accepted
+        # Force boolean; string chaining returns last truthy string otherwise
+        all_filled = bool(username and email and password and confirm_password and terms_accepted)
         
         self.signup_button.setEnabled(is_valid and all_filled)
     

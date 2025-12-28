@@ -6,7 +6,7 @@
 -- USE personal_info_manager;
 
 -- Users table
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS personal_info_manager.users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- User profiles table
-CREATE TABLE IF NOT EXISTS profiles (
+CREATE TABLE IF NOT EXISTS personal_info_manager.profiles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
     full_name VARCHAR(100),
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS password_vault (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Financial investments table
-CREATE TABLE IF NOT EXISTS financial_investments (
+CREATE TABLE IF NOT EXISTS personal_info_manager.financial_investments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     investment_type VARCHAR(50) NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS insurance_policies (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Real estate table
-CREATE TABLE IF NOT EXISTS real_estate (
+CREATE TABLE IF NOT EXISTS personal_info_manager.real_estate (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     property_type VARCHAR(50) NOT NULL,
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS real_estate (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Passports and citizenship documents table
-CREATE TABLE IF NOT EXISTS passports_citizenship (
+CREATE TABLE IF NOT EXISTS personal_info_manager.passports_citizenship (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     family_member_name VARCHAR(100) NOT NULL,
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS passports_citizenship (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Health cards table
-CREATE TABLE IF NOT EXISTS health_cards (
+CREATE TABLE IF NOT EXISTS personal_info_manager.health_cards (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     family_member_name VARCHAR(100) NOT NULL,
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS services_billing (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Reminders and to-dos table
-CREATE TABLE IF NOT EXISTS reminders_todos (
+CREATE TABLE IF NOT EXISTS personal_info_manager.reminders_todos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     title VARCHAR(200) NOT NULL,

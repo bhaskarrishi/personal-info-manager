@@ -30,7 +30,7 @@ class EncryptionManager:
             secret_key = Config.SECRET_KEY.encode()
             
             # Derive a valid Fernet key from the secret key
-            kdf = PBKDF2(
+            kdf = PBKDF2HMAC(
                 algorithm=hashes.SHA256(),
                 length=32,
                 salt=b'personal_info_manager_salt',  # Fixed salt for consistency
