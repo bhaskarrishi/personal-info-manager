@@ -4,8 +4,8 @@ Profile management window for user profile information.
 import logging
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                             QLineEdit, QPushButton, QFormLayout, QMessageBox,
-                            QFileDialog, QGroupBox)
-from PyQt6.QtCore import Qt
+                            QFileDialog, QGroupBox, QDateEdit, QTextEdit)
+from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtGui import QPixmap
 from database.db_manager import DatabaseManager
 from src.utils.validators import validate_phone, sanitize_input
@@ -100,6 +100,37 @@ class ProfileWindow(QWidget):
         self.country_input = QLineEdit()
         self.country_input.setPlaceholderText('Enter country')
         form_layout.addRow('Country:', self.country_input)
+
+        # Driver licence details
+        self.license_number_input = QLineEdit()
+        self.license_number_input.setPlaceholderText('Enter license number')
+        form_layout.addRow('License Number:', self.license_number_input)
+
+        self.license_country_input = QLineEdit()
+        self.license_country_input.setPlaceholderText('Issuing country')
+        form_layout.addRow('License Country:', self.license_country_input)
+
+        self.license_state_input = QLineEdit()
+        self.license_state_input.setPlaceholderText('Issuing state/province')
+        form_layout.addRow('License State/Province:', self.license_state_input)
+
+        self.license_issue_date_input = QDateEdit()
+        self.license_issue_date_input.setCalendarPopup(True)
+        self.license_issue_date_input.setDate(QDate.currentDate())
+        form_layout.addRow('Issue Date:', self.license_issue_date_input)
+
+        self.license_expiry_date_input = QDateEdit()
+        self.license_expiry_date_input.setCalendarPopup(True)
+        self.license_expiry_date_input.setDate(QDate.currentDate().addYears(5))
+        form_layout.addRow('Expiry Date:', self.license_expiry_date_input)
+
+        self.license_class_input = QLineEdit()
+        self.license_class_input.setPlaceholderText('e.g., Class D, LMV')
+        form_layout.addRow('License Class:', self.license_class_input)
+
+        self.license_notes_input = QTextEdit()
+        self.license_notes_input.setMaximumHeight(70)
+        form_layout.addRow('License Notes:', self.license_notes_input)
         
         info_group.setLayout(form_layout)
         layout.addWidget(info_group)
@@ -123,7 +154,9 @@ class ProfileWindow(QWidget):
         """Load profile data from database."""
         try:
             query = """
-                SELECT full_name, phone, address, city, state, zip, country, photo_path
+                  SELECT full_name, phone, address, city, state, zip, country, photo_path,
+                      license_number, license_country, license_state,
+                      license_issue_date, license_expiry_date, license_class, license_notes
                 FROM profiles
                 WHERE user_id = %s
             """
@@ -138,6 +171,17 @@ class ProfileWindow(QWidget):
                 self.state_input.setText(profile['state'] or '')
                 self.zip_input.setText(profile['zip'] or '')
                 self.country_input.setText(profile['country'] or '')
+                self.license_number_input.setText(profile['license_number'] or '')
+                self.license_country_input.setText(profile['license_country'] or '')
+                self.license_state_input.setText(profile['license_state'] or '')
+
+                if profile['license_issue_date']:
+                    self.license_issue_date_input.setDate(QDate.fromString(str(profile['license_issue_date']), 'yyyy-MM-dd'))
+                if profile['license_expiry_date']:
+                    self.license_expiry_date_input.setDate(QDate.fromString(str(profile['license_expiry_date']), 'yyyy-MM-dd'))
+
+                self.license_class_input.setText(profile['license_class'] or '')
+                self.license_notes_input.setPlainText(profile['license_notes'] or '')
                 
                 # Load photo if exists
                 if profile['photo_path']:
@@ -173,13 +217,32 @@ class ProfileWindow(QWidget):
             query = """
                 UPDATE profiles
                 SET full_name = %s, phone = %s, address = %s, city = %s,
-                    state = %s, zip = %s, country = %s, photo_path = %s
+                    state = %s, zip = %s, country = %s, photo_path = %s,
+                    license_number = %s, license_country = %s, license_state = %s,
+                    license_issue_date = %s, license_expiry_date = %s,
+                    license_class = %s, license_notes = %s
                 WHERE user_id = %s
             """
             self.db.execute_query(
                 query,
-                (full_name, phone, address, city, state, zip_code, country,
-                 self.photo_path, self.user_id)
+                (
+                    full_name,
+                    phone,
+                    address,
+                    city,
+                    state,
+                    zip_code,
+                    country,
+                    self.photo_path,
+                    sanitize_input(self.license_number_input.text()),
+                    sanitize_input(self.license_country_input.text()),
+                    sanitize_input(self.license_state_input.text()),
+                    self.license_issue_date_input.date().toString('yyyy-MM-dd'),
+                    self.license_expiry_date_input.date().toString('yyyy-MM-dd'),
+                    sanitize_input(self.license_class_input.text()),
+                    sanitize_input(self.license_notes_input.toPlainText()),
+                    self.user_id,
+                )
             )
             
             QMessageBox.information(self, 'Success', 'Profile updated successfully!')

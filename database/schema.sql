@@ -28,6 +28,13 @@ CREATE TABLE IF NOT EXISTS personal_info_manager.profiles (
     state VARCHAR(100),
     zip VARCHAR(20),
     country VARCHAR(100),
+    license_number VARCHAR(100),
+    license_country VARCHAR(100),
+    license_state VARCHAR(100),
+    license_issue_date DATE,
+    license_expiry_date DATE,
+    license_class VARCHAR(50),
+    license_notes TEXT,
     photo_path VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -185,4 +192,72 @@ CREATE TABLE IF NOT EXISTS personal_info_manager.reminders_todos (
     INDEX idx_due_date (due_date),
     INDEX idx_status (status),
     INDEX idx_priority (priority)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Banking accounts table
+CREATE TABLE IF NOT EXISTS personal_info_manager.banking_accounts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    account_name VARCHAR(150) NOT NULL,
+    account_type VARCHAR(50) NOT NULL,
+    institution VARCHAR(150),
+    account_number VARCHAR(150),
+    iban VARCHAR(150),
+    country VARCHAR(100),
+    currency CHAR(3) NOT NULL,
+    balance DECIMAL(15, 2) DEFAULT 0,
+    available_balance DECIMAL(15, 2) DEFAULT 0,
+    interest_rate DECIMAL(5, 2),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_currency (currency),
+    INDEX idx_account_type (account_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Mortgages table
+CREATE TABLE IF NOT EXISTS personal_info_manager.mortgages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    lender VARCHAR(150) NOT NULL,
+    property_reference VARCHAR(255),
+    currency CHAR(3) NOT NULL,
+    original_amount DECIMAL(15, 2),
+    outstanding_balance DECIMAL(15, 2),
+    interest_rate DECIMAL(5, 3),
+    payment_amount DECIMAL(15, 2),
+    payment_frequency VARCHAR(50),
+    next_due_date DATE,
+    start_date DATE,
+    maturity_date DATE,
+    escrow_amount DECIMAL(15, 2),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_next_due_date (next_due_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Reference documents table
+CREATE TABLE IF NOT EXISTS personal_info_manager.reference_documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    document_type VARCHAR(100),
+    description TEXT,
+    file_path VARCHAR(500) NOT NULL,
+    country VARCHAR(100),
+    issued_by VARCHAR(150),
+    issue_date DATE,
+    expiry_date DATE,
+    tags VARCHAR(200),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_document_type (document_type),
+    INDEX idx_expiry_date (expiry_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

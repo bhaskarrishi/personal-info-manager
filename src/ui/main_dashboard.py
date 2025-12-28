@@ -12,12 +12,15 @@ from src.utils.styles import get_main_stylesheet
 from src.modules.profile_window import ProfileWindow
 from src.modules.password_vault_window import PasswordVaultWindow
 from src.modules.financial_window import FinancialWindow
+from src.modules.banking_window import BankingWindow
+from src.modules.mortgage_window import MortgageWindow
 from src.modules.insurance_window import InsuranceWindow
 from src.modules.real_estate_window import RealEstateWindow
 from src.modules.passport_window import PassportWindow
 from src.modules.health_cards_window import HealthCardsWindow
 from src.modules.services_window import ServicesWindow
 from src.modules.reminders_window import RemindersWindow
+from src.modules.reference_documents_window import ReferenceDocumentsWindow
 
 logger = logging.getLogger(__name__)
 
@@ -182,11 +185,14 @@ class MainDashboard(QWidget):
             'Profile',
             'Password Vault',
             'Financial Investments',
+            'Banking Accounts',
+            'Mortgages',
             'Insurance Policies',
             'Real Estate',
             'Passport/Citizenship',
             'Health Cards',
             'Services/Billing',
+            'Reference Documents',
             'Reminders/To-Do'
         ]
         
@@ -211,22 +217,28 @@ class MainDashboard(QWidget):
         self.profile_window = ProfileWindow(user_id)
         self.password_vault_window = PasswordVaultWindow(user_id)
         self.financial_window = FinancialWindow(user_id)
+        self.banking_window = BankingWindow(user_id)
+        self.mortgage_window = MortgageWindow(user_id)
         self.insurance_window = InsuranceWindow(user_id)
         self.real_estate_window = RealEstateWindow(user_id)
         self.passport_window = PassportWindow(user_id)
         self.health_cards_window = HealthCardsWindow(user_id)
         self.services_window = ServicesWindow(user_id)
         self.reminders_window = RemindersWindow(user_id)
+        self.reference_docs_window = ReferenceDocumentsWindow(user_id)
         
         # Add to stacked widget
         self.content_stack.addWidget(self.profile_window)
         self.content_stack.addWidget(self.password_vault_window)
         self.content_stack.addWidget(self.financial_window)
+        self.content_stack.addWidget(self.banking_window)
+        self.content_stack.addWidget(self.mortgage_window)
         self.content_stack.addWidget(self.insurance_window)
         self.content_stack.addWidget(self.real_estate_window)
         self.content_stack.addWidget(self.passport_window)
         self.content_stack.addWidget(self.health_cards_window)
         self.content_stack.addWidget(self.services_window)
+        self.content_stack.addWidget(self.reference_docs_window)
         self.content_stack.addWidget(self.reminders_window)
         
         logger.debug("All modules initialized")
