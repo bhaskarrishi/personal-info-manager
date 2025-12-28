@@ -261,3 +261,26 @@ CREATE TABLE IF NOT EXISTS personal_info_manager.reference_documents (
     INDEX idx_document_type (document_type),
     INDEX idx_expiry_date (expiry_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Credit cards table
+CREATE TABLE IF NOT EXISTS personal_info_manager.credit_cards (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    cardholder_name VARCHAR(150) NOT NULL,
+    card_type VARCHAR(50) NOT NULL,
+    card_number VARCHAR(255),
+    last_four_digits VARCHAR(4),
+    issuer VARCHAR(100),
+    expiry_date DATE,
+    cvv VARCHAR(10),
+    credit_limit DECIMAL(15, 2),
+    current_balance DECIMAL(15, 2),
+    card_status VARCHAR(50) DEFAULT 'Active',
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_card_type (card_type),
+    INDEX idx_expiry_date (expiry_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

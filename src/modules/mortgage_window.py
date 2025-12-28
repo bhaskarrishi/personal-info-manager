@@ -236,62 +236,51 @@ class MortgageDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle('Mortgage Entry')
         self.setModal(True)
-        self.setMinimumWidth(540)
+        self.setMinimumWidth(900)
+        self.setMinimumHeight(400)
         self.data = data or {}
         self.init_ui()
 
     def init_ui(self):
         layout = QVBoxLayout()
-        form_layout = QFormLayout()
-        form_layout.setSpacing(12)
-
+        
+        # Two-column form layout
+        form_container = QWidget()
+        form_layout = QHBoxLayout()
+        form_layout.setSpacing(20)
+        
+        # Left column
+        left_col = QFormLayout()
+        left_col.setSpacing(12)
+        
         self.lender_input = QLineEdit(self.data.get('lender', ''))
-        form_layout.addRow('Lender*:', self.lender_input)
+        left_col.addRow('Lender*:', self.lender_input)
 
         self.property_ref_input = QLineEdit(self.data.get('property_reference', ''))
-        form_layout.addRow('Property Reference:', self.property_ref_input)
+        left_col.addRow('Property Ref:', self.property_ref_input)
 
         self.currency_input = QComboBox()
         self.currency_input.addItems(CURRENCY_CHOICES)
         self.currency_input.setCurrentText(self.data.get('currency', 'USD'))
-        form_layout.addRow('Currency*:', self.currency_input)
+        left_col.addRow('Currency*:', self.currency_input)
 
         self.original_amount_input = QDoubleSpinBox()
         self.original_amount_input.setMaximum(999999999.99)
         self.original_amount_input.setDecimals(2)
         self.original_amount_input.setValue(float(self.data.get('original_amount', 0)))
-        form_layout.addRow('Original Amount:', self.original_amount_input)
+        left_col.addRow('Original Amount:', self.original_amount_input)
 
         self.outstanding_balance_input = QDoubleSpinBox()
         self.outstanding_balance_input.setMaximum(999999999.99)
         self.outstanding_balance_input.setDecimals(2)
         self.outstanding_balance_input.setValue(float(self.data.get('outstanding_balance', 0)))
-        form_layout.addRow('Outstanding Balance:', self.outstanding_balance_input)
+        left_col.addRow('Outstanding:', self.outstanding_balance_input)
 
         self.interest_rate_input = QDoubleSpinBox()
         self.interest_rate_input.setMaximum(100.000)
         self.interest_rate_input.setDecimals(3)
         self.interest_rate_input.setValue(float(self.data.get('interest_rate', 0)))
-        form_layout.addRow('Interest Rate (%):', self.interest_rate_input)
-
-        self.payment_amount_input = QDoubleSpinBox()
-        self.payment_amount_input.setMaximum(999999999.99)
-        self.payment_amount_input.setDecimals(2)
-        self.payment_amount_input.setValue(float(self.data.get('payment_amount', 0)))
-        form_layout.addRow('Payment Amount:', self.payment_amount_input)
-
-        self.payment_frequency_input = QComboBox()
-        self.payment_frequency_input.addItems(PAYMENT_FREQUENCY)
-        self.payment_frequency_input.setCurrentText(self.data.get('payment_frequency', 'Monthly'))
-        form_layout.addRow('Payment Frequency:', self.payment_frequency_input)
-
-        self.next_due_date_input = QDateEdit()
-        self.next_due_date_input.setCalendarPopup(True)
-        if self.data.get('next_due_date'):
-            self.next_due_date_input.setDate(QDate.fromString(str(self.data['next_due_date']), 'yyyy-MM-dd'))
-        else:
-            self.next_due_date_input.setDate(QDate.currentDate())
-        form_layout.addRow('Next Due Date:', self.next_due_date_input)
+        left_col.addRow('Interest Rate:', self.interest_rate_input)
 
         self.start_date_input = QDateEdit()
         self.start_date_input.setCalendarPopup(True)
@@ -299,7 +288,30 @@ class MortgageDialog(QDialog):
             self.start_date_input.setDate(QDate.fromString(str(self.data['start_date']), 'yyyy-MM-dd'))
         else:
             self.start_date_input.setDate(QDate.currentDate())
-        form_layout.addRow('Start Date:', self.start_date_input)
+        left_col.addRow('Start Date:', self.start_date_input)
+        
+        # Right column
+        right_col = QFormLayout()
+        right_col.setSpacing(12)
+
+        self.payment_amount_input = QDoubleSpinBox()
+        self.payment_amount_input.setMaximum(999999999.99)
+        self.payment_amount_input.setDecimals(2)
+        self.payment_amount_input.setValue(float(self.data.get('payment_amount', 0)))
+        right_col.addRow('Payment Amount:', self.payment_amount_input)
+
+        self.payment_frequency_input = QComboBox()
+        self.payment_frequency_input.addItems(PAYMENT_FREQUENCY)
+        self.payment_frequency_input.setCurrentText(self.data.get('payment_frequency', 'Monthly'))
+        right_col.addRow('Payment Freq:', self.payment_frequency_input)
+
+        self.next_due_date_input = QDateEdit()
+        self.next_due_date_input.setCalendarPopup(True)
+        if self.data.get('next_due_date'):
+            self.next_due_date_input.setDate(QDate.fromString(str(self.data['next_due_date']), 'yyyy-MM-dd'))
+        else:
+            self.next_due_date_input.setDate(QDate.currentDate())
+        right_col.addRow('Next Due Date:', self.next_due_date_input)
 
         self.maturity_date_input = QDateEdit()
         self.maturity_date_input.setCalendarPopup(True)
@@ -307,19 +319,32 @@ class MortgageDialog(QDialog):
             self.maturity_date_input.setDate(QDate.fromString(str(self.data['maturity_date']), 'yyyy-MM-dd'))
         else:
             self.maturity_date_input.setDate(QDate.currentDate().addYears(20))
-        form_layout.addRow('Maturity Date:', self.maturity_date_input)
+        right_col.addRow('Maturity Date:', self.maturity_date_input)
 
         self.escrow_amount_input = QDoubleSpinBox()
         self.escrow_amount_input.setMaximum(999999999.99)
         self.escrow_amount_input.setDecimals(2)
         self.escrow_amount_input.setValue(float(self.data.get('escrow_amount', 0)))
-        form_layout.addRow('Escrow Amount:', self.escrow_amount_input)
-
+        right_col.addRow('Escrow Amount:', self.escrow_amount_input)
+        
+        # Add columns to layout
+        left_widget = QWidget()
+        left_widget.setLayout(left_col)
+        right_widget = QWidget()
+        right_widget.setLayout(right_col)
+        
+        form_layout.addWidget(left_widget)
+        form_layout.addWidget(right_widget)
+        form_container.setLayout(form_layout)
+        
+        layout.addWidget(form_container)
+        
+        # Notes section below
+        notes_label = QLabel('Notes:')
+        layout.addWidget(notes_label)
         self.notes_input = QTextEdit(self.data.get('notes', ''))
-        self.notes_input.setMaximumHeight(100)
-        form_layout.addRow('Notes:', self.notes_input)
-
-        layout.addLayout(form_layout)
+        self.notes_input.setMaximumHeight(80)
+        layout.addWidget(self.notes_input)
 
         button_layout = QHBoxLayout()
         button_layout.addStretch()

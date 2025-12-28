@@ -14,6 +14,7 @@ from src.modules.password_vault_window import PasswordVaultWindow
 from src.modules.financial_window import FinancialWindow
 from src.modules.banking_window import BankingWindow
 from src.modules.mortgage_window import MortgageWindow
+from src.modules.credit_cards_window import CreditCardsWindow
 from src.modules.insurance_window import InsuranceWindow
 from src.modules.real_estate_window import RealEstateWindow
 from src.modules.passport_window import PassportWindow
@@ -187,6 +188,7 @@ class MainDashboard(QWidget):
             'Financial Investments',
             'Banking Accounts',
             'Mortgages',
+            'Credit Cards',
             'Insurance Policies',
             'Real Estate',
             'Passport/Citizenship',
@@ -219,13 +221,14 @@ class MainDashboard(QWidget):
         self.financial_window = FinancialWindow(user_id)
         self.banking_window = BankingWindow(user_id)
         self.mortgage_window = MortgageWindow(user_id)
+        self.credit_cards_window = CreditCardsWindow(user_id)
         self.insurance_window = InsuranceWindow(user_id)
         self.real_estate_window = RealEstateWindow(user_id)
         self.passport_window = PassportWindow(user_id)
         self.health_cards_window = HealthCardsWindow(user_id)
         self.services_window = ServicesWindow(user_id)
-        self.reminders_window = RemindersWindow(user_id)
         self.reference_docs_window = ReferenceDocumentsWindow(user_id)
+        self.reminders_window = RemindersWindow(user_id)
         
         # Add to stacked widget
         self.content_stack.addWidget(self.profile_window)
@@ -233,6 +236,7 @@ class MainDashboard(QWidget):
         self.content_stack.addWidget(self.financial_window)
         self.content_stack.addWidget(self.banking_window)
         self.content_stack.addWidget(self.mortgage_window)
+        self.content_stack.addWidget(self.credit_cards_window)
         self.content_stack.addWidget(self.insurance_window)
         self.content_stack.addWidget(self.real_estate_window)
         self.content_stack.addWidget(self.passport_window)
