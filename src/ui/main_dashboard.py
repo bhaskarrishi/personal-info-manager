@@ -15,6 +15,7 @@ from src.modules.financial_window import FinancialWindow
 from src.modules.banking_window import BankingWindow
 from src.modules.mortgage_window import MortgageWindow
 from src.modules.credit_cards_window import CreditCardsWindow
+from src.modules.social_insurance_window import SocialInsuranceWindow
 from src.modules.insurance_window import InsuranceWindow
 from src.modules.real_estate_window import RealEstateWindow
 from src.modules.passport_window import PassportWindow
@@ -189,6 +190,7 @@ class MainDashboard(QWidget):
             'Banking Accounts',
             'Mortgages',
             'Credit Cards',
+            'Social Insurance',
             'Insurance Policies',
             'Real Estate',
             'Passport/Citizenship',
@@ -222,6 +224,7 @@ class MainDashboard(QWidget):
         self.banking_window = BankingWindow(user_id)
         self.mortgage_window = MortgageWindow(user_id)
         self.credit_cards_window = CreditCardsWindow(user_id)
+        self.social_insurance_window = SocialInsuranceWindow(user_id)
         self.insurance_window = InsuranceWindow(user_id)
         self.real_estate_window = RealEstateWindow(user_id)
         self.passport_window = PassportWindow(user_id)
@@ -237,6 +240,7 @@ class MainDashboard(QWidget):
         self.content_stack.addWidget(self.banking_window)
         self.content_stack.addWidget(self.mortgage_window)
         self.content_stack.addWidget(self.credit_cards_window)
+        self.content_stack.addWidget(self.social_insurance_window)
         self.content_stack.addWidget(self.insurance_window)
         self.content_stack.addWidget(self.real_estate_window)
         self.content_stack.addWidget(self.passport_window)

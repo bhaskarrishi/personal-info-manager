@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt, QDate
 from database.db_manager import DatabaseManager
 from src.dialogs.confirmation_dialog import ConfirmationDialog
+from src.dialogs.password_verification_dialog import PasswordVerificationDialog
 
 logger = logging.getLogger(__name__)
 
@@ -111,6 +112,11 @@ class ServicesWindow(QWidget):
         current_row = self.table.currentRow()
         if current_row < 0:
             QMessageBox.warning(self, 'No Selection', 'Please select a service to edit')
+            return
+        
+        # Verify password before editing
+        pwd_dialog = PasswordVerificationDialog(self.db, self.user_id, self)
+        if pwd_dialog.exec() != QDialog.DialogCode.Accepted:
             return
         
         service_id = self.table.item(current_row, 0).data(Qt.ItemDataRole.UserRole)

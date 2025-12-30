@@ -25,6 +25,7 @@ from PyQt6.QtCore import Qt, QDate, QUrl
 from PyQt6.QtGui import QDesktopServices
 from database.db_manager import DatabaseManager
 from src.dialogs.confirmation_dialog import ConfirmationDialog
+from src.dialogs.password_verification_dialog import PasswordVerificationDialog
 
 logger = logging.getLogger(__name__)
 UPLOAD_ROOT = Path('storage/uploads')
@@ -166,6 +167,11 @@ class ReferenceDocumentsWindow(QWidget):
         current_row = self.table.currentRow()
         if current_row < 0:
             QMessageBox.warning(self, 'No Selection', 'Please select a document to edit')
+            return
+
+        # Verify password before editing
+        pwd_dialog = PasswordVerificationDialog(self.db, self.user_id, self)
+        if pwd_dialog.exec() != QDialog.DialogCode.Accepted:
             return
 
         doc_id = self.table.item(current_row, 0).data(Qt.ItemDataRole.UserRole)

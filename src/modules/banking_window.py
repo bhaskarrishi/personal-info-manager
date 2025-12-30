@@ -24,6 +24,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from database.db_manager import DatabaseManager
 from src.dialogs.confirmation_dialog import ConfirmationDialog
+from src.dialogs.password_verification_dialog import PasswordVerificationDialog
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,7 @@ class BankingWindow(QWidget):
         super().__init__()
         self.user_id = user_id
         self.db = DatabaseManager()
+        self.show_sensitive = False
         self.init_ui()
         self.load_accounts()
 
@@ -69,6 +71,11 @@ class BankingWindow(QWidget):
         delete_button.clicked.connect(self.delete_account)
         button_layout.addWidget(delete_button)
 
+        self.toggle_sensitive_btn = QPushButton('Show Sensitive Data')
+        self.toggle_sensitive_btn.setProperty('class', 'secondary')
+        self.toggle_sensitive_btn.clicked.connect(self.toggle_sensitive_data)
+        button_layout.addWidget(self.toggle_sensitive_btn)
+
         button_layout.addStretch()
         layout.addLayout(button_layout)
 
@@ -83,6 +90,15 @@ class BankingWindow(QWidget):
         layout.addWidget(self.table)
 
         self.setLayout(layout)
+
+    def toggle_sensitive_data(self):
+        """Toggle visibility of sensitive data."""
+        self.show_sensitive = not self.show_sensitive
+        if self.show_sensitive:
+            self.toggle_sensitive_btn.setText('Hide Sensitive Data')
+        else:
+            self.toggle_sensitive_btn.setText('Show Sensitive Data')
+        self.load_accounts()
 
     def load_accounts(self):
         """Load banking accounts from database."""
@@ -106,7 +122,12 @@ class BankingWindow(QWidget):
 
                     self.table.setItem(row_pos, 0, QTableWidgetItem(row['account_name'] or ''))
                     self.table.setItem(row_pos, 1, QTableWidgetItem(row['account_type'] or ''))
-                    self.table.setItem(row_pos, 2, QTableWidgetItem(row['institution'] or ''))
+                    
+                    # Mask institution name if not showing sensitive
+                    institution = row['institution'] or ''
+                    if not self.show_sensitive and institution:
+                        institution = institution[:3] + '****' if len(institution) > 3 else '****'
+                    self.table.setItem(row_pos, 2, QTableWidgetItem(institution))
                     self.table.setItem(row_pos, 3, QTableWidgetItem(row['country'] or ''))
                     self.table.setItem(row_pos, 4, QTableWidgetItem(row['currency'] or ''))
                     self.table.setItem(
@@ -171,6 +192,11 @@ class BankingWindow(QWidget):
             QMessageBox.warning(self, 'No Selection', 'Please select an account to edit')
             return
 
+        # Verify password before editing
+        pwd_dialog = PasswordVerificationDialog(self.db, self.user_id, self)
+        if pwd_dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+
         account_id = self.table.item(current_row, 0).data(Qt.ItemDataRole.UserRole)
         try:
             result = self.db.execute_query(
@@ -219,7 +245,17 @@ class BankingWindow(QWidget):
             return
 
         account_id = self.table.item(current_row, 0).data(Qt.ItemDataRole.UserRole)
-        dialog = ConfirmationDialog('Confirm Delete', 'Are you sure you want to delete this account?', self)
+        
+        # Verify password before deletion
+        pwd_dialog = PasswordVerificationDialog(self.db, self.user_id, self)
+        if pwd_dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        
+        dialog = ConfirmationDialog(
+            'Confirm Delete',
+            'Are you sure you want to permanently delete this account?\n\nThis action cannot be undone.',
+            self
+        )
         if dialog.exec() == QDialog.DialogCode.Accepted:
             try:
                 self.db.execute_query("DELETE FROM banking_accounts WHERE id = %s", (account_id,))

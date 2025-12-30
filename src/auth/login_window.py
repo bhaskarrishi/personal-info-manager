@@ -41,6 +41,16 @@ class LoginWindow(QWidget):
         main_layout.setContentsMargins(40, 40, 40, 40)
         main_layout.setSpacing(20)
         
+        # Logo - Vintage Computer Icon
+        logo_label = QLabel('🖥️')
+        logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        logo_font = QFont()
+        logo_font.setPointSize(48)
+        logo_label.setFont(logo_font)
+        main_layout.addWidget(logo_label)
+        
+        main_layout.addSpacing(10)
+        
         # Title
         title_label = QLabel('Personal Information\nManager')
         title_label.setObjectName('titleLabel')

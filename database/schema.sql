@@ -284,3 +284,23 @@ CREATE TABLE IF NOT EXISTS personal_info_manager.credit_cards (
     INDEX idx_card_type (card_type),
     INDEX idx_expiry_date (expiry_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Social insurance table
+CREATE TABLE IF NOT EXISTS personal_info_manager.social_insurance (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    family_member_name VARCHAR(150) NOT NULL,
+    relationship VARCHAR(50),
+    insurance_type VARCHAR(100) NOT NULL,
+    insurance_number VARCHAR(100),
+    country VARCHAR(100),
+    issue_date DATE,
+    expiry_date DATE,
+    issuing_authority VARCHAR(150),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_insurance_type (insurance_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt, QDate
 from database.db_manager import DatabaseManager
 from src.dialogs.confirmation_dialog import ConfirmationDialog
+from src.dialogs.password_verification_dialog import PasswordVerificationDialog
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class PassportWindow(QWidget):
         super().__init__()
         self.user_id = user_id
         self.db = DatabaseManager()
+        self.show_sensitive = False
         self.init_ui()
         self.load_documents()
     
@@ -46,6 +48,11 @@ class PassportWindow(QWidget):
         button_layout.addWidget(delete_button)
         
         button_layout.addStretch()
+        
+        self.toggle_sensitive_btn = QPushButton('Show Sensitive Data')
+        self.toggle_sensitive_btn.setProperty('class', 'secondary')
+        self.toggle_sensitive_btn.clicked.connect(self.toggle_sensitive_data)
+        button_layout.addWidget(self.toggle_sensitive_btn)
         layout.addLayout(button_layout)
         
         self.table = QTableWidget()
@@ -76,7 +83,15 @@ class PassportWindow(QWidget):
                     self.table.setItem(row_position, 0, QTableWidgetItem(row_data['family_member_name'] or ''))
                     self.table.setItem(row_position, 1, QTableWidgetItem(row_data['relationship'] or ''))
                     self.table.setItem(row_position, 2, QTableWidgetItem(row_data['document_type'] or ''))
-                    self.table.setItem(row_position, 3, QTableWidgetItem(row_data['document_number'] or ''))
+                    
+                    # Mask document number if sensitive data is hidden
+                    doc_number = row_data['document_number'] or ''
+                    if not self.show_sensitive and doc_number:
+                        masked_number = '****' + doc_number[-4:] if len(doc_number) > 4 else '****'
+                        self.table.setItem(row_position, 3, QTableWidgetItem(masked_number))
+                    else:
+                        self.table.setItem(row_position, 3, QTableWidgetItem(doc_number))
+                    
                     self.table.setItem(row_position, 4, QTableWidgetItem(str(row_data['issue_date']) if row_data['issue_date'] else ''))
                     self.table.setItem(row_position, 5, QTableWidgetItem(str(row_data['expiry_date']) if row_data['expiry_date'] else ''))
                     
@@ -84,6 +99,15 @@ class PassportWindow(QWidget):
         except Exception as e:
             logger.error(f"Error loading documents: {e}")
             QMessageBox.critical(self, 'Error', f'Failed to load documents: {str(e)}')
+    
+    def toggle_sensitive_data(self):
+        """Toggle between showing and hiding sensitive data."""
+        self.show_sensitive = not self.show_sensitive
+        if self.show_sensitive:
+            self.toggle_sensitive_btn.setText('Hide Sensitive Data')
+        else:
+            self.toggle_sensitive_btn.setText('Show Sensitive Data')
+        self.load_documents()
     
     def add_document(self):
         """Add new document."""
@@ -113,6 +137,11 @@ class PassportWindow(QWidget):
         current_row = self.table.currentRow()
         if current_row < 0:
             QMessageBox.warning(self, 'No Selection', 'Please select a document to edit')
+            return
+        
+        # Verify password before editing
+        pwd_dialog = PasswordVerificationDialog(self.db, self.user_id, self)
+        if pwd_dialog.exec() != QDialog.DialogCode.Accepted:
             return
         
         doc_id = self.table.item(current_row, 0).data(Qt.ItemDataRole.UserRole)

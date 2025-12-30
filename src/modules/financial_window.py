@@ -123,6 +123,11 @@ class FinancialWindow(QWidget):
             QMessageBox.warning(self, 'No Selection', 'Please select an investment to edit')
             return
         
+        # Verify password before editing
+        pwd_dialog = PasswordVerificationDialog(self.db, self.user_id, self)
+        if pwd_dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        
         investment_id = self.table.item(current_row, 0).data(Qt.ItemDataRole.UserRole)
         
         try:

@@ -9,6 +9,7 @@ from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtGui import QPixmap
 from database.db_manager import DatabaseManager
 from src.utils.validators import validate_phone, sanitize_input
+from src.dialogs.password_verification_dialog import PasswordVerificationDialog
 
 logger = logging.getLogger(__name__)
 
@@ -196,6 +197,11 @@ class ProfileWindow(QWidget):
     def save_profile(self):
         """Save profile data to database."""
         try:
+            # Verify password before saving changes
+            pwd_dialog = PasswordVerificationDialog(self.db, self.user_id, self)
+            if pwd_dialog.exec() != QDialog.DialogCode.Accepted:
+                return
+            
             # Validate phone number
             phone = self.phone_input.text().strip()
             if phone:
